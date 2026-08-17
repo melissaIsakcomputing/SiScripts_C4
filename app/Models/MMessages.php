@@ -34,12 +34,13 @@ class MMessages extends Model
 
     function logMessage($xml, $dataMessage)
     {
+        $layout = "Messages";
         $this->fm = $this->getRestFM(
-            "data.sicompound.cloud",
-            "SiScripts.fmp12",
-            "icapi",
-            "1c4p1",
-            "Messages",
+            DataServer,
+            DataFile,
+            DataServerUsername,
+            DataServerPass,
+            $layout,
             "fmtoken1"
         );
         $record = [
@@ -49,12 +50,13 @@ class MMessages extends Model
             'MessageFromID' => urlencode($dataMessage['MessageFromID']),
             'MessageFromQ' => urlencode($dataMessage['MessageFromQ']),
         ];
-        $result = $this->fm->createRecord(['fieldData' => $record], 'Messages');
+        $result = $this->fm->createRecord(['fieldData' => $record], $layout);
         return ['error' => $this->error($result)];
     }
 
     function sendMessage($xml, $data)
     {
+        $layout = "Messages";
         $host = "";
         $method = "mailbox";
         $messageTo = $data['MessageToID'];
@@ -68,10 +70,10 @@ class MMessages extends Model
         }
         $this->fm = $this->getRestFM(
             $host,
-            "SiScripts.fmp12",
-            "icapi",
-            "1c4p1",
-            "Messages",
+            HostFile,
+            HostUsername,
+            HostPass,
+            $layout,
             "fmtoken2"
         );
         $record = [
@@ -81,18 +83,19 @@ class MMessages extends Model
             'MessageFromID' => urlencode($data['MessageFromID']),
             'MessageFromQ' => urlencode($data['MessageFromQ'])
         ];
-        $result = $this->fm->createRecord(['fieldData' => $record], 'Messages');
+        $result = $this->fm->createRecord(['fieldData' => $record], $layout);
         return ['error' => $this->error($result)];
     }
 
     public function logResponseMessage($message)
     {
+        $layout = "Messages";
         $this->fm = $this->getRestFM(
-            "data.sicompound.cloud",
-            "SiScripts.fmp12",
-            "icapi",
-            "1c4p1",
-            "Messages",
+            DataServer .
+            DataFile,
+            DataServerUsername,
+            DataServerPass,
+            $layout,
             "fmtoken1"
         );
         $record = [
@@ -106,12 +109,13 @@ class MMessages extends Model
             'MessageStatusCode' => $message['Code'],
             'MessageType' => $message['MessageType']
         ];
-        $result = $this->fm->createRecord(['fieldData' => $record], 'Messages');
+        $result = $this->fm->createRecord(['fieldData' => $record],   $layout);
         return ['error' => $this->error($result)];
     }
 
     public function sendResponseMessage(array $message): array
     {
+        $layout = "Messages";
         $connection = $this->getPharmacyConnection($message['MessageToID']);
         /*
          * Currently all pharmacies are mailbox.
@@ -123,10 +127,10 @@ class MMessages extends Model
         }
         $this->fm = new RestFM(
             $connection['host'],
-            'SiScripts.fmp12',
-            'icapi',
-            '1c4p1',
-            'Messages',
+           HostFile,
+            HostUsername,
+            HostPass,
+            $layout,
             'fmtoken2'
         );
         $record = [

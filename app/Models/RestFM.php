@@ -380,6 +380,12 @@ class RestFM extends Model
 
         $ch = curl_init();
 
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        curl_setopt($ch, CURLOPT_LOW_SPEED_LIMIT, 100);
+        curl_setopt($ch, CURLOPT_LOW_SPEED_TIME, 30);
+
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);         //follow redirects
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);         //return the transfer as a string 
         if ($this -> secure)  {

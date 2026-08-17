@@ -19,6 +19,12 @@ class SureScriptAdapter
     public function postMessage($url, $xml)
     {
         $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_LOW_SPEED_LIMIT, 100);
+        curl_setopt($ch, CURLOPT_LOW_SPEED_TIME, 30);
+
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CAINFO, SureScriptCA);
         curl_setopt($ch, CURLOPT_SSLCERT, SureScriptPem);

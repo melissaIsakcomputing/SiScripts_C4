@@ -8,7 +8,6 @@ class MOrganizations extends Model
     function  __construct()
     {
         parent::__construct();
-        $this->load->model('RESTFM18');
         $this->fm = new RESTFM18();
     }
 
