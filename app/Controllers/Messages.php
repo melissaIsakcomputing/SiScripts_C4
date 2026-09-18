@@ -78,8 +78,6 @@ class Messages extends BaseController
 
     function testPharmacy()
     {
-
-
         $this->load->model('RestFM');
         $this->fm = new RestFM();
 

@@ -14,6 +14,7 @@
  | existing namespaces of App\* namespaced-classes.
  */
 defined('APP_NAMESPACE') || define('APP_NAMESPACE', 'App');
+define("ENVIRONMENT","development");
 
 /*
  | --------------------------------------------------------------------------
@@ -86,7 +87,7 @@ const ScriptExchange = 'https://smx.script.exchange/message';
 /* production */
 //const ScriptExchange = 'https://pmx.script.exchange/message';
 
-const DataServer = "data.sicompound.cloud";
+const DataServer = "data-dev.sicompound.cloud";
 const DataServerUsername = "icapi";
 const DataServerPass = "1c4p1";
 const DataFile = "SiScripts.fmp12";

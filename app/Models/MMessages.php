@@ -32,10 +32,11 @@ class MMessages extends Model
         return $return;
     }
 
-    function logMessage($xml, $dataMessage)
+
+    function logMessage($dataMessage, $xml = "")
     {
         $layout = "Messages";
-        $this->fm = $this->getRestFM(
+        $this->fm = new RestFM(
             DataServer,
             DataFile,
             DataServerUsername,
@@ -44,7 +45,8 @@ class MMessages extends Model
             "fmtoken1"
         );
         $record = [
-            'XML_Encode' => base64_encode($xml),
+            'XML' => urlencode($dataMessage['rawXml']),
+            'SenderPlatform' => urlencode($dataMessage['SenderPlatform']),
             'MessageToID' => urlencode($dataMessage['MessageToID']),
             'MessageToQ' => urlencode($dataMessage['MessageToQ']),
             'MessageFromID' => urlencode($dataMessage['MessageFromID']),
@@ -109,7 +111,7 @@ class MMessages extends Model
             'MessageStatusCode' => $message['Code'],
             'MessageType' => $message['MessageType']
         ];
-        $result = $this->fm->createRecord(['fieldData' => $record],   $layout);
+        $result = $this->fm->createRecord(['fieldData' => $record], $layout);
         return ['error' => $this->error($result)];
     }
 
@@ -127,7 +129,7 @@ class MMessages extends Model
         }
         $this->fm = new RestFM(
             $connection['host'],
-           HostFile,
+            HostFile,
             HostUsername,
             HostPass,
             $layout,
