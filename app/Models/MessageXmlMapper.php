@@ -181,6 +181,7 @@ class MessageXmlMapper
     private const SUPPORTED_VERSIONS = [
         '20170715',
         '2023011',
+        '20230115'
     ];
 
     private function versionAttribute(\DOMElement $element, string $attribute): string

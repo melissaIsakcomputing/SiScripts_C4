@@ -6,7 +6,7 @@ class MMessages
 {
     function __construct()
     {
-        
+
     }
 
     function error($result)
