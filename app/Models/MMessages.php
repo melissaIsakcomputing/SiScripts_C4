@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
-
-class MMessages extends Model
+class MMessages
 {
     function __construct()
     {
