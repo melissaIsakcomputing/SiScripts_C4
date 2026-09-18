@@ -20,27 +20,38 @@ class MessageXmlMapper
             throw new InvalidArgumentException('The XML body is empty.');
         }
 
-        $document = new DOMDocument();
+        // Decode only when the body does not already contain raw XML.
+        if (!str_starts_with(ltrim($rawXml), '<')) {
+            $decodedXml = trim(urldecode($rawXml));
+
+            if (str_starts_with(ltrim($decodedXml), '<')) {
+                $rawXml = $decodedXml;
+            }
+        }
+
+        $document = new DOMDocument('1.0', 'UTF-8');
 
         $previousSetting = libxml_use_internal_errors(true);
         libxml_clear_errors();
 
-        $loaded = $document->loadXML( $rawXml,LIBXML_NONET | LIBXML_NOBLANKS );
-
-        $errors = libxml_get_errors();
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($previousSetting);
-
-        if (!$loaded) {
-            throw new InvalidArgumentException(
-                $this->formatXmlErrors($errors)
+        try {
+            $loaded = $document->loadXML(
+                $rawXml,
+                LIBXML_NONET | LIBXML_NOBLANKS
             );
+
+            if (!$loaded) {
+                throw new InvalidArgumentException(
+                    $this->formatXmlErrors(libxml_get_errors())
+                );
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousSetting);
         }
 
         $xpath = new DOMXPath($document);
-
-        $root = $document->documentElement;
+        $root  = $document->documentElement;
 
         if (!$root instanceof DOMElement || $root->localName !== 'Message') {
             throw new InvalidArgumentException(
@@ -50,23 +61,26 @@ class MessageXmlMapper
 
         $toNode = $this->requiredNode(
             $xpath,
-            '//*[local-name()="Header"]/*[local-name()="To"]'
+            '/*[local-name()="Message"]/*[local-name()="Header"]/*[local-name()="To"]'
         );
 
         $fromNode = $this->requiredNode(
             $xpath,
-            '//*[local-name()="Header"]/*[local-name()="From"]'
+            '/*[local-name()="Message"]/*[local-name()="Header"]/*[local-name()="From"]'
         );
 
         return [
             'senderPlatform' => $platform,
 
-            'messageId' => $this->requiredValue(  $xpath,'//*[local-name()="Header"]/*[local-name()="MessageID"]' ),
+            'messageId' => $this->requiredValue(
+                $xpath,
+                '/*[local-name()="Message"]/*[local-name()="Header"]/*[local-name()="MessageID"]'
+            ),
 
-            'messageToId' => trim($toNode->textContent),
+            'messageToId'        => trim($toNode->textContent),
             'messageToQualifier' => $toNode->getAttribute('Qualifier'),
 
-            'messageFromId' => trim($fromNode->textContent),
+            'messageFromId'        => trim($fromNode->textContent),
             'messageFromQualifier' => $fromNode->getAttribute('Qualifier'),
 
             'versions' => [
@@ -96,7 +110,7 @@ class MessageXmlMapper
                 ),
             ],
 
-            // Store the complete normalized XML.
+            // This value contains decoded and normalized XML.
             'rawXml' => $document->saveXML(),
 
             'receivedAt' => date(DATE_ATOM),

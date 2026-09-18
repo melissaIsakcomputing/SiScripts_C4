@@ -44,7 +44,7 @@ class MMessages
         );
 
         $record = [
-            'XML' => urlencode($dataMessage['rawXml']),
+            'XML' => $dataMessage['rawXml'],
             'SenderPlatform' => urlencode($dataMessage['senderPlatform']),
             'MessageToID' => urlencode($dataMessage['messageToId']),
             'MessageToQ' => urlencode($dataMessage['messageToQualifier']),
