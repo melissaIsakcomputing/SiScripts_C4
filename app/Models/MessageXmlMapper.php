@@ -12,7 +12,7 @@ class MessageXmlMapper
     /**
      * Converts the incoming XML into application data.
      */
-    public function fromXml(string $rawXml): array
+    public function fromXml(string $rawXml, $platform): array
     {
         $rawXml = trim($rawXml);
 
@@ -59,6 +59,8 @@ class MessageXmlMapper
         );
 
         return [
+            'senderPlatform' => $platform,
+
             'messageId' => $this->requiredValue(  $xpath,'//*[local-name()="Header"]/*[local-name()="MessageID"]' ),
 
             'messageToId' => trim($toNode->textContent),

@@ -46,8 +46,8 @@ class MessagesController extends BaseController
     private function saveMessage($platform)
     {
         $rawXml = (string)$this->request->getBody();
-        $result = $this->mapper->fromXml($rawXml);
-        $message = $result['message'];
+        $message = $this->mapper->fromXml($rawXml, $platform);
+
         $logResult = $this->mMessages->logMessage($message);
 
         return $this->xmlResponse([

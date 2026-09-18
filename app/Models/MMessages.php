@@ -44,13 +44,14 @@ class MMessages extends Model
             $layout,
             "fmtoken1"
         );
+
         $record = [
             'XML' => urlencode($dataMessage['rawXml']),
-            'SenderPlatform' => urlencode($dataMessage['SenderPlatform']),
-            'MessageToID' => urlencode($dataMessage['MessageToID']),
-            'MessageToQ' => urlencode($dataMessage['MessageToQ']),
-            'MessageFromID' => urlencode($dataMessage['MessageFromID']),
-            'MessageFromQ' => urlencode($dataMessage['MessageFromQ']),
+            'SenderPlatform' => urlencode($dataMessage['senderPlatform']),
+            'MessageToID' => urlencode($dataMessage['messageToId']),
+            'MessageToQ' => urlencode($dataMessage['messageToQualifier']),
+            'MessageFromID' => urlencode($dataMessage['messageFromId']),
+            'MessageFromQ' => urlencode($dataMessage['messageFromQualifier']),
         ];
         $result = $this->fm->createRecord(['fieldData' => $record], $layout);
         return ['error' => $this->error($result)];
