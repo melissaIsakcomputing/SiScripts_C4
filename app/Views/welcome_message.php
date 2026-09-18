@@ -1,5 +1,5 @@
 <?php
-defined('APPPATH') OR exit('No direct script access allowed');
+defined('APPPATH')  OR exit('No direct script access allowed');
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
