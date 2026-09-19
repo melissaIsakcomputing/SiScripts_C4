@@ -89,9 +89,7 @@ class MessagesController extends BaseController
         ];
 
         $statusXml = view('status_message', $data);
-        $channelId = trim(
-            (string) env('SCRIPT_EXCHANGE_CHANNEL_ID')
-        );
+        $channelId = "VC96HWsEdX";
 
         $response = $this->sendStatusMessage(
             $channelId,
@@ -120,13 +118,9 @@ class MessagesController extends BaseController
         $clientCertificatePath = $certificateDirectory . 'certificate.crt';
         $privateKeyPath = $certificateDirectory . 'private_key.pem';
 
-        $apiKey = trim(
-            (string) env('SCRIPT_EXCHANGE_CHANNEL_API_KEY')
-        );
+        $apiKey = "KN9i6CPLIv8AuQPphMbljnC7I6RmkpHE52HHqyH1";
 
-        $privateKeyPassword = trim(
-            (string) env('SCRIPT_EXCHANGE_KEY_PASSWORD')
-        );
+        $privateKeyPassword = "KN9i6CPLIv8AuQPphMbljnC7I6RmkpHE52HHqyH1";
 
         if ($channelId === '') {
             throw new RuntimeException(
