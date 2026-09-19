@@ -1,7 +1,7 @@
 <?php
 $escapeXml = static function ($value): string {
     return htmlspecialchars(
-        (string) ($value ?? ''),
+        (string)($value ?? ''),
         ENT_XML1 | ENT_QUOTES,
         'UTF-8'
     );
@@ -35,14 +35,5 @@ $escapeXml = static function ($value): string {
         <Code><?= $escapeXml($Code ?? '900') ?></Code>
     </Status>
 
-    <?php if (!empty($dev)): ?>
-        <Dev>
-            <Msg><?= $escapeXml($dev) ?></Msg>
-
-            <?php if (!empty($devCode)): ?>
-                <Code><?= $escapeXml($devCode) ?></Code>
-            <?php endif; ?>
-        </Dev>
-    <?php endif; ?>
     </Body>
 </Message>
