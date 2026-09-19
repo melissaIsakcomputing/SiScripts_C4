@@ -112,8 +112,9 @@ class MessagesController extends BaseController
         $apiKey            = "KN9i6CPLIv8AuQPphMbljnC7I6RmkpHE52HHqyH1";
         $privateKeyPassword = "KN9i6CPLIv8AuQPphMbljnC7I6RmkpHE52HHqyH1";
         $headers = [
-            'content-type: application/xml',
-            'x-api-key: ' . $apiKey,
+            'Content-Type: application/xml; charset=UTF-8',
+            'Accept: application/xml',
+            'X-API-Key: ' . $apiKey,
         ];
 
         $verboseStream = fopen('php://temp', 'w+');
