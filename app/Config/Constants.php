@@ -83,7 +83,7 @@ const SureScriptURL = 'https://smr.surescripts.net';
 const SureScriptDirectoryURL = 'https://dir.surescripts.net/directory/Directory6dot1/v6_1';
 
 /* staging */
-const ScriptExchange = 'https://smx.script.exchange/message/VC96HWsEdX';
+const ScriptExchange = 'https://smx.script.exchange';
 /* production */
 //const ScriptExchange = 'https://pmx.script.exchange/message';
 

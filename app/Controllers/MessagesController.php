@@ -89,7 +89,14 @@ class MessagesController extends BaseController
         ];
 
         $statusXml = view('status_message', $data);
-        $this->sendStatusMessage(ScriptExchange, $statusXml);
+        $channelId = trim(
+            (string) env('SCRIPT_EXCHANGE_CHANNEL_ID')
+        );
+
+        $response = $this->sendStatusMessage(
+            $channelId,
+            $statusXml
+        );
 
         $responseXml = $this->xmlResponse($data);
 
@@ -104,134 +111,110 @@ class MessagesController extends BaseController
             ->setBody(view('status_message', $data));
     }
 
-    private function sendStatusMessage(string $url, string $xml): string
-    {
+    private function sendStatusMessage(
+        string $channelId,
+        string $xml
+    ): string {
         $certificateDirectory = ROOTPATH . 'certificates/exchange/';
+
         $clientCertificatePath = $certificateDirectory . 'certificate.crt';
-        $privateKeyPath        = $certificateDirectory . 'private_key.pem';
-        $apiKey            = "KN9i6CPLIv8AuQPphMbljnC7I6RmkpHE52HHqyH1";
-        $privateKeyPassword = "KN9i6CPLIv8AuQPphMbljnC7I6RmkpHE52HHqyH1";
+        $privateKeyPath = $certificateDirectory . 'private_key.pem';
+
+        $apiKey = trim(
+            (string) env('SCRIPT_EXCHANGE_CHANNEL_API_KEY')
+        );
+
+        $privateKeyPassword = trim(
+            (string) env('SCRIPT_EXCHANGE_KEY_PASSWORD')
+        );
+
+        if ($channelId === '') {
+            throw new RuntimeException(
+                'The Script Exchange channel ID is missing.'
+            );
+        }
+
+        if ($apiKey === '') {
+            throw new RuntimeException(
+                'The Script Exchange channel API key is missing.'
+            );
+        }
+
+        if (!is_readable($clientCertificatePath)) {
+            throw new RuntimeException(
+                "Client certificate is not readable: {$clientCertificatePath}"
+            );
+        }
+
+        if (!is_readable($privateKeyPath)) {
+            throw new RuntimeException(
+                "Private key is not readable: {$privateKeyPath}"
+            );
+        }
+
+        $url = 'https://smx.script.exchange/message/'
+            . rawurlencode($channelId);
+
         $headers = [
-            'Content-Type: application/xml; charset=UTF-8',
-            'Accept: application/xml',
-            'X-API-Key: ' . $apiKey,
+            'Content-Type: application/xml',
+            'x-api-key: ' . $apiKey,
         ];
 
-        $verboseStream = fopen('php://temp', 'w+');
-        $responseHeaders = [];
         $ch = curl_init();
+
         curl_setopt_array($ch, [
             CURLOPT_URL            => $url,
+            CURLOPT_PORT           => 443,
             CURLOPT_POST           => true,
+
+            // Sends the raw XML, equivalent to req.write(BODY).
             CURLOPT_POSTFIELDS     => $xml,
+
             CURLOPT_HTTPHEADER     => $headers,
             CURLOPT_RETURNTRANSFER => true,
 
-            CURLOPT_CONNECTTIMEOUT  => 5,
-            CURLOPT_TIMEOUT         => 30,
-            CURLOPT_LOW_SPEED_LIMIT => 100,
-            CURLOPT_LOW_SPEED_TIME  => 30,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT        => 30,
 
-            /*
-             * Client certificate and encrypted private key.
-             */
+            // Equivalent to cert in the JavaScript code.
             CURLOPT_SSLCERT        => $clientCertificatePath,
             CURLOPT_SSLCERTTYPE    => 'PEM',
+
+            // Equivalent to key in the JavaScript code.
             CURLOPT_SSLKEY         => $privateKeyPath,
             CURLOPT_SSLKEYTYPE     => 'PEM',
+
+            // Needed because your private key is encrypted.
             CURLOPT_KEYPASSWD      => $privateKeyPassword,
 
-            /*
-             * Always verify the remote server.
-             */
-            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-
-            /*
-             * Capture diagnostics.
-             */
-            CURLOPT_VERBOSE        => true,
-            CURLOPT_STDERR         => $verboseStream,
-            CURLINFO_HEADER_OUT    => true,
-
-            /*
-             * Capture the response headers separately from the body.
-             */
-            CURLOPT_HEADERFUNCTION => static function (
-                $curl,
-                string $headerLine
-            ) use (&$responseHeaders): int {
-                $length = strlen($headerLine);
-                $trimmedHeader = trim($headerLine);
-
-                if ($trimmedHeader !== '') {
-                    $responseHeaders[] = $trimmedHeader;
-                }
-
-                return $length;
-            },
         ]);
 
-        $result = curl_exec($ch);
+        $responseBody = curl_exec($ch);
 
-        $curlErrorNumber  = curl_errno($ch);
+        $curlErrorNumber = curl_errno($ch);
         $curlErrorMessage = curl_error($ch);
-        $httpCode         = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $contentType      = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-        $requestHeaders   = curl_getinfo($ch, CURLINFO_HEADER_OUT);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        rewind($verboseStream);
-        $curlTrace = stream_get_contents($verboseStream);
-
-        fclose($verboseStream);
         curl_close($ch);
 
-        $diagnostics = [
-            'url'             => $url,
-            'httpCode'        => $httpCode,
-            'responseType'    => $contentType,
-            'requestHeaders'  => $requestHeaders,
-            'responseHeaders' => $responseHeaders,
-            'responseBody'    => $result,
-            'curlErrorNumber' => $curlErrorNumber,
-            'curlErrorMessage' => $curlErrorMessage,
-            'curlTrace'       => $curlTrace,
-
-            /*
-             * Avoid logging the complete XML in production because
-             * prescription XML can contain patient information.
-             */
-            'requestBodyLength' => strlen($xml),
-        ];
-
-        log_message(
-            'debug',
-            "Status message request:\n{diagnostics}",
-            [
-                'diagnostics' => json_encode(
-                    $diagnostics,
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                ),
-            ]
-        );
-
-        if ($result === false) {
+        if ($responseBody === false) {
             throw new RuntimeException(
-                "Status message connection failed ({$curlErrorNumber}): "
-                . $curlErrorMessage
+                "Script Exchange connection failed "
+                . "({$curlErrorNumber}): {$curlErrorMessage}"
             );
         }
 
         if ($httpCode < 200 || $httpCode >= 300) {
             throw new RuntimeException(
-                "Status endpoint returned HTTP {$httpCode}. "
-                . "Response: {$result}"
+                "Script Exchange returned HTTP {$httpCode}. "
+                . "Response: {$responseBody}"
             );
         }
 
-        return $result;
+        return $responseBody;
     }
-
     public function sendScriptExchangeStatus()
     {
         $xml = "";
