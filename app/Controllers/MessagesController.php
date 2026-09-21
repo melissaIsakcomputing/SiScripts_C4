@@ -88,7 +88,11 @@ class MessagesController extends BaseController
             'debug' => false,
         ];
 
-        $statusXml = view('status_message', $data);
+        return view('status_message', $data, ['debug' => false]);
+
+        $statusXml = view('status_message', $data, ['debug' => false]);
+        $statusXml = preg_replace('/^\xEF\xBB\xBF/', '', $statusXml);
+        $statusXml = ltrim($statusXml);
         $channelId = "VC96HWsEdX";
 
         $response = $this->sendStatusMessage(
@@ -112,7 +116,8 @@ class MessagesController extends BaseController
     private function sendStatusMessage(
         string $channelId,
         string $xml
-    ): string {
+    ): string
+    {
         $certificateDirectory = ROOTPATH . 'certificates/exchange/';
 
         $clientCertificatePath = $certificateDirectory . 'certificate.crt';
@@ -157,29 +162,29 @@ class MessagesController extends BaseController
         $ch = curl_init();
 
         curl_setopt_array($ch, [
-            CURLOPT_URL            => $url,
-            CURLOPT_PORT           => 443,
-            CURLOPT_POST           => true,
+            CURLOPT_URL => $url,
+            CURLOPT_PORT => 443,
+            CURLOPT_POST => true,
 
             // Sends the raw XML, equivalent to req.write(BODY).
-            CURLOPT_POSTFIELDS     => $xml,
+            CURLOPT_POSTFIELDS => $xml,
 
-            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_HTTPHEADER => $headers,
             CURLOPT_RETURNTRANSFER => true,
 
             CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_TIMEOUT => 30,
 
             // Equivalent to cert in the JavaScript code.
-            CURLOPT_SSLCERT        => $clientCertificatePath,
-            CURLOPT_SSLCERTTYPE    => 'PEM',
+            CURLOPT_SSLCERT => $clientCertificatePath,
+            CURLOPT_SSLCERTTYPE => 'PEM',
 
             // Equivalent to key in the JavaScript code.
-            CURLOPT_SSLKEY         => $privateKeyPath,
-            CURLOPT_SSLKEYTYPE     => 'PEM',
+            CURLOPT_SSLKEY => $privateKeyPath,
+            CURLOPT_SSLKEYTYPE => 'PEM',
 
             // Needed because your private key is encrypted.
-            CURLOPT_KEYPASSWD      => $privateKeyPassword,
+            CURLOPT_KEYPASSWD => $privateKeyPassword,
 
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 2,
@@ -209,6 +214,7 @@ class MessagesController extends BaseController
 
         return $responseBody;
     }
+
     public function sendScriptExchangeStatus()
     {
         $xml = "";

@@ -1,27 +1,17 @@
-<?php
-$escapeXml = static function ($value): string {
-    return htmlspecialchars(
-        (string)($value ?? ''),
-        ENT_XML1 | ENT_QUOTES,
-        'UTF-8'
-    );
-};
-
-?>
-<?= '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL ?>
+<?='<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL ?>
 <Message
-        DatatypesVersion="<?= $escapeXml($DatatypesVersion ?? '20170715') ?>"
-        TransportVersion="<?= $escapeXml($TransportVersion ?? '20170715') ?>"
-        TransactionDomain="<?= $escapeXml($TransactionDomain ?? 'SCRIPT') ?>"
-        TransactionVersion="<?= $escapeXml($TransactionVersion ?? '20170715') ?>"
-        StructuresVersion="<?= $escapeXml($StructuresVersion ?? '20170715') ?>"
-        ECLVersion="<?= $escapeXml($ECLVersion ?? '20170715') ?>">
+        DatatypesVersion="<?= $DatatypesVersion ?? '20170715'?>"
+        TransportVersion="<?= $TransportVersion ?? '20170715' ?>"
+        TransactionDomain="<?= $TransactionDomain ?? 'SCRIPT' ?>"
+        TransactionVersion="<?= $TransactionVersion ?? '20170715' ?>"
+        StructuresVersion="<?= $StructuresVersion ?? '20170715' ?>"
+        ECLVersion="<?= $ECLVersion ?? '20170715' ?>">
     <Header>
-        <To Qualifier="<?= $escapeXml($MessageToQ ?? '') ?>"><?= $escapeXml($MessageToID ?? '') ?></To>
-        <From Qualifier="<?= $escapeXml($MessageFromQ ?? '') ?>"><?= $escapeXml($MessageFromID ?? '') ?></From>
-        <MessageID><?= $escapeXml($MessageID ?? '') ?></MessageID>
-        <RelatesToMessageID><?= $escapeXml($RelatesToMessageID ?? '') ?></RelatesToMessageID>
-        <SentTime><?= $escapeXml($SentTime ?? date(DATE_ATOM)) ?></SentTime>
+        <To Qualifier="<?= $MessageToQ ?? '' ?>"><?= $MessageToID ?? ''?></To>
+        <From Qualifier="<?= $MessageFromQ ?? '' ?>"><?= $MessageFromID ?? '' ?></From>
+        <MessageID><?= $MessageID ?? ''?></MessageID>
+        <RelatesToMessageID><?= $RelatesToMessageID ?? '' ?></RelatesToMessageID>
+        <SentTime><?= $SentTime ?? date(DATE_ATOM) ?></SentTime>
 
         <SenderSoftware>
             <SenderSoftwareDeveloper>Isak Computing, LLC</SenderSoftwareDeveloper>
@@ -29,11 +19,9 @@ $escapeXml = static function ($value): string {
             <SenderSoftwareVersionRelease>1.0</SenderSoftwareVersionRelease>
         </SenderSoftware>
     </Header>
-
     <Body>
     <Status>
-        <Code><?= $escapeXml($Code ?? '900') ?></Code>
+        <Code><?= $Code ?? '900' ?></Code>
     </Status>
-
     </Body>
 </Message>
