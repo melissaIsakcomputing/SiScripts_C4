@@ -181,7 +181,7 @@ class MessagesController extends BaseController
             // Needed because your private key is encrypted.
             CURLOPT_KEYPASSWD      => $privateKeyPassword,
 
-            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 2,
         ]);
 
