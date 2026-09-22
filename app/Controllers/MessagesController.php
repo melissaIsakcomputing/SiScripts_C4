@@ -88,7 +88,7 @@ class MessagesController extends BaseController
             'debug' => false,
         ];
 
-        return view('status_message', $data, ['debug' => false]);
+//        return view('status_message', $data, ['debug' => false]);
 
         $statusXml = view('status_message', $data, ['debug' => false]);
         $statusXml = preg_replace('/^\xEF\xBB\xBF/', '', $statusXml);
@@ -102,6 +102,7 @@ class MessagesController extends BaseController
 
         $responseXml = $this->xmlResponse($data);
 
+        return view('status_message', $data, ['debug' => false]);
         return $responseXml;
     }
 
