@@ -8,7 +8,7 @@ class MNotifications extends Model
     function  __construct()
     {
         parent::__construct();
-        $this->fm = new RESTFM18();
+        $this->fm = new RestFM();
     }
 
     function error($result)

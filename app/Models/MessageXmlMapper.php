@@ -15,31 +15,24 @@ class MessageXmlMapper
     public function fromXml(string $rawXml, $platform): array
     {
         $rawXml = trim($rawXml);
-
         if ($rawXml === '') {
             throw new InvalidArgumentException('The XML body is empty.');
         }
-
         // Decode only when the body does not already contain raw XML.
         if (!str_starts_with(ltrim($rawXml), '<')) {
             $decodedXml = trim(urldecode($rawXml));
-
             if (str_starts_with(ltrim($decodedXml), '<')) {
                 $rawXml = $decodedXml;
             }
         }
-
         $document = new DOMDocument('1.0', 'UTF-8');
-
         $previousSetting = libxml_use_internal_errors(true);
         libxml_clear_errors();
-
         try {
             $loaded = $document->loadXML(
                 $rawXml,
                 LIBXML_NONET | LIBXML_NOBLANKS
             );
-
             if (!$loaded) {
                 throw new InvalidArgumentException(
                     $this->formatXmlErrors(libxml_get_errors())
@@ -49,40 +42,31 @@ class MessageXmlMapper
             libxml_clear_errors();
             libxml_use_internal_errors($previousSetting);
         }
-
         $xpath = new DOMXPath($document);
-        $root  = $document->documentElement;
-
+        $root = $document->documentElement;
         if (!$root instanceof DOMElement || $root->localName !== 'Message') {
             throw new InvalidArgumentException(
                 'The XML root element must be Message.'
             );
         }
-
         $toNode = $this->requiredNode(
             $xpath,
             '/*[local-name()="Message"]/*[local-name()="Header"]/*[local-name()="To"]'
         );
-
         $fromNode = $this->requiredNode(
             $xpath,
             '/*[local-name()="Message"]/*[local-name()="Header"]/*[local-name()="From"]'
         );
-
         return [
             'senderPlatform' => $platform,
-
             'messageId' => $this->requiredValue(
                 $xpath,
                 '/*[local-name()="Message"]/*[local-name()="Header"]/*[local-name()="MessageID"]'
             ),
-
-            'messageToId'        => trim($toNode->textContent),
+            'messageToId' => trim($toNode->textContent),
             'messageToQualifier' => $toNode->getAttribute('Qualifier'),
-
-            'messageFromId'        => trim($fromNode->textContent),
+            'messageFromId' => trim($fromNode->textContent),
             'messageFromQualifier' => $fromNode->getAttribute('Qualifier'),
-
             'versions' => [
                 'datatypes' => $this->versionAttribute(
                     $root,
@@ -109,10 +93,8 @@ class MessageXmlMapper
                     'ECLVersion'
                 ),
             ],
-
             // This value contains decoded and normalized XML.
             'rawXml' => $document->saveXML(),
-
             'receivedAt' => date(DATE_ATOM),
         ];
     }
@@ -144,7 +126,6 @@ class MessageXmlMapper
     {
         $node = $this->requiredNode($xpath, $expression);
         $value = trim($node->textContent);
-
         if ($value === '') {
             throw new InvalidArgumentException(
                 'A required XML element is empty: ' . $expression
@@ -157,17 +138,11 @@ class MessageXmlMapper
     private function requiredNode(DOMXPath $xpath, string $expression): DOMElement
     {
         $nodes = $xpath->query($expression);
-
-        if (
-            $nodes === false ||
-            $nodes->length === 0 ||
-            !($nodes->item(0) instanceof DOMElement)
-        ) {
+        if ($nodes === false || $nodes->length === 0 || !($nodes->item(0) instanceof DOMElement)) {
             throw new InvalidArgumentException(
                 'A required XML element is missing: ' . $expression
             );
         }
-
         return $nodes->item(0);
     }
 
@@ -176,9 +151,7 @@ class MessageXmlMapper
         if ($errors === []) {
             return 'The request body is not valid XML.';
         }
-
         $messages = [];
-
         foreach ($errors as $error) {
             $messages[] = sprintf(
                 'Line %d, column %d: %s',
@@ -187,10 +160,8 @@ class MessageXmlMapper
                 trim($error->message)
             );
         }
-
         return implode(' | ', $messages);
     }
-
 
     private const SUPPORTED_VERSIONS = [
         '20170715',
@@ -201,7 +172,6 @@ class MessageXmlMapper
     private function versionAttribute(\DOMElement $element, string $attribute): string
     {
         $value = $this->requiredAttribute($element, $attribute);
-
         if (!in_array($value, self::SUPPORTED_VERSIONS, true)) {
             throw new \InvalidArgumentException(
                 sprintf(
@@ -212,15 +182,12 @@ class MessageXmlMapper
                 )
             );
         }
-
         return $value;
     }
-
 
     private function requiredAttribute(DOMElement $element, string $attribute): string
     {
         $value = trim($element->getAttribute($attribute));
-
         if ($value === '') {
             throw new InvalidArgumentException(
                 sprintf(
@@ -229,7 +196,6 @@ class MessageXmlMapper
                 )
             );
         }
-
         return $value;
     }
 }

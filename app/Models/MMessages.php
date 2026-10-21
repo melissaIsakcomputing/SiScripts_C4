@@ -9,6 +9,30 @@ class MMessages
 
     }
 
+    /* This will store the message in the switch. */
+    function logSwitchMessage($dataMessage, $xml = "")
+    {
+        $layout = "Messages";
+        $this->fm = new RestFM(
+            DataServer,
+            DataFile,
+            DataServerUsername,
+            DataServerPass,
+            $layout,
+            "fmtoken1"
+        );
+        $record = [
+            'XML' => $dataMessage['rawXml'],
+            'SenderPlatform' => urlencode($dataMessage['senderPlatform']),
+            'MessageToID' => urlencode($dataMessage['messageToId']),
+            'MessageToQ' => urlencode($dataMessage['messageToQualifier']),
+            'MessageFromID' => urlencode($dataMessage['messageFromId']),
+            'MessageFromQ' => urlencode($dataMessage['messageFromQualifier']),
+        ];
+        $result = $this->fm->createRecord(['fieldData' => $record], $layout);
+        return ['error' => $this->error($result)];
+    }
+
     function error($result)
     {
         if (isset($result["messages"][0]["code"]) && $result["messages"][0]["code"] != '0') {
@@ -16,6 +40,9 @@ class MMessages
         }
         return 0;
     }
+
+    //TODO review
+
 
     function Result($error_code = 0, $error_msg = 0, $result = '')
     {
@@ -31,29 +58,7 @@ class MMessages
     }
 
 
-    function logMessage($dataMessage, $xml = "")
-    {
-        $layout = "Messages";
-        $this->fm = new RestFM(
-            DataServer,
-            DataFile,
-            DataServerUsername,
-            DataServerPass,
-            $layout,
-            "fmtoken1"
-        );
 
-        $record = [
-            'XML' => $dataMessage['rawXml'],
-            'SenderPlatform' => urlencode($dataMessage['senderPlatform']),
-            'MessageToID' => urlencode($dataMessage['messageToId']),
-            'MessageToQ' => urlencode($dataMessage['messageToQualifier']),
-            'MessageFromID' => urlencode($dataMessage['messageFromId']),
-            'MessageFromQ' => urlencode($dataMessage['messageFromQualifier']),
-        ];
-        $result = $this->fm->createRecord(['fieldData' => $record], $layout);
-        return ['error' => $this->error($result)];
-    }
 
     function sendMessage($xml, $data)
     {
