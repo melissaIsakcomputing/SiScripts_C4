@@ -80,7 +80,8 @@ class MessagesController extends BaseController
             'ECLVersion' => $incomingMessage['versions']['ecl'],
             'debug' => false,
         ];
-        if ($logResult == 0) {
+        $error = $logResult['error'];
+        if ($error == 0) {
             return $this->response
                 ->setStatusCode(200)
                 ->setContentType('application/xml')
