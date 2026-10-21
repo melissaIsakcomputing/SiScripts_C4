@@ -1,0 +1,45 @@
+
+name: Deploy SiScripts
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: siscripts-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Ubuntu
+    runs-on:
+      - self-hosted
+      - linux
+      - siscripts
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Deploy files
+        run: |
+          rsync -av \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.env' \
+            --exclude='writable/' \
+            --exclude='node_modules/' \
+            --exclude='vendor/' \
+            --chmod=D755,F644 \
+            ./ /var/www/html/siscripts/
+
+      - name: Verify deployment
+        run: |
+          echo "Deployed commit: $GITHUB_SHA"
+          echo "Deployment successful"
