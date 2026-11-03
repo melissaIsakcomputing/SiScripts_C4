@@ -471,10 +471,10 @@ class RestFM extends Model
 
     function __construct($host = '', $db = '', $user = '', $pass = '', $layout = '', $token_name = 'tokenName')
     {
-        if (empty($host)) $host = HOST;
-        if (empty($db)) $db = DB;
-        if (empty($user)) $user = USER;
-        if (empty($pass)) $pass = PASS;
+        if (empty($host)) $host = env('Data_Server');
+        if (empty($db)) $db = env('Host_File');
+        if (empty($user)) $user = env('Host_Username');
+        if (empty($pass)) $pass = env('Host_Pass');
 
         if (empty($layout) && LAYOUT != '') $layout = LAYOUT;
 

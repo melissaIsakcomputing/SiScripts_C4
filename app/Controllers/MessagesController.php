@@ -60,6 +60,8 @@ class MessagesController extends BaseController
         $rawXml = (string)$this->request->getBody();
         $incomingMessage = $this->mapper->fromXml($rawXml, $platform);
         $logResult = $this->mMessages->logSwitchMessage($incomingMessage);
+        print_r($logResult);
+        die();
         $data = [
             'SenderPlatform' => $platform,
             'MessageID' => uniqid('response_', true),
