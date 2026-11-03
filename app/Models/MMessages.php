@@ -21,8 +21,7 @@ class MMessages
             $layout,
             "fmtoken1"
         );
-        print_r( env('Data_Server').env('Data_File').env('Data_Server_Username').env('Data_Server_Pass'));
-        die();
+
         $record = [
             'XML' => $dataMessage['rawXml'],
             'SenderPlatform' => urlencode($dataMessage['senderPlatform']),
