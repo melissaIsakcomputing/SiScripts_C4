@@ -24,11 +24,11 @@ class InboundMessageController extends BaseController
         $this->messageService = new IncomingMessageService(new MessageXmlMapper(), $this->repository);
     }
 
-    public function saveMessage(): ResponseInterface
+    public function saveMessage($platform): ResponseInterface
     {
         $rawXml = (string)$this->request->getBody();
         try {
-            $result = $this->messageService->process($rawXml, "APIv3");
+            $result = $this->messageService->process($rawXml, $platform);
             $xmlResponse = $result['xmlResponse'];
             return $this->xmlResponse($xmlResponse);
         } catch (InvalidArgumentException $exception) {
