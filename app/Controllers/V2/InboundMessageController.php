@@ -52,4 +52,19 @@ class InboundMessageController extends BaseController
             ->setBody(view('status_message', $data, ['debug' => false]));
     }
 
+    public function saveAPIMessage()
+    {
+        return $this->saveMessage("APIv3");
+    }
+
+    public function saveScriptExchangeMessage()
+    {
+        return $this->saveMessage("ScriptExchange");
+    }
+
+    public function saveSurescriptMessage()
+    {
+        return $this->saveMessage("SureScript");
+    }
+
 }
