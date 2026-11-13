@@ -10,3 +10,5 @@ $routes->post('script-exchange/inbounds', 'V2\\InboundMessageController::saveScr
 $routes->post('script-exchange/outbounds', 'ScriptExchangeController::sendMessage');
 
 $routes->post('messages', 'V2\\InboundMessageController::saveSurescriptMessage');
+
+$routes->post('sureScripts/outbounds/(:segment)', 'V2\\SureScriptsOutController::sendMessage/$1');

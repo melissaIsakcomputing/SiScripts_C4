@@ -87,14 +87,13 @@ const ScriptExchange = 'https://smx.script.exchange';
 /* production */
 //const ScriptExchange = 'https://pmx.script.exchange/message';
 
-const DataServer = "data-dev.sicompound.cloud";
-const DataServerUsername = "icapi";
-const DataServerPass = "1c4p1";
-const DataFile = "SiScripts.fmp12";
-const HostFile = "SiScripts.fmp12";
-const HostUsername = "1c4p1";
-const HostPass= "1c4p1";
-
+//define("DataServer", env('Data_Server'));
+//define("DataServerUsername", env('Data_Server_Username'));
+//define("DataServerPass", env('Data_Server_Pass'));
+//define("DataFile", env('Data_File'));
+//define("HostFile", env('Host_File'));
+//define("HostUsername", env('Host_Username'));
+//define("HostPass", env('Host_Pass'));
 
 define("SureScriptCA", dirname(__FILE__, 4) . "etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem");
 define("SureScriptPem", dirname(__FILE__, 2) . "/ssl/cert/certkey.pem");

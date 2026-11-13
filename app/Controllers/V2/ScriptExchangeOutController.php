@@ -1,20 +1,16 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\V2;
 
 /*
  * @change Isak - 2/14/2024 - Return Error Code 600 for Communication problem - try again later
  * @change Isak - 2/14/2024 - Return Status Code 000 for Not able to reach final destination (pharmacy)
  */
 
-use App\Models\MessageXmlMapper;
-use App\Models\MMessages;
+use App\Controllers\BaseController;
 use App\Models\OutboundMessageService;
-use CodeIgniter\HTTP\ResponseInterface;
-use http\Env;
-use RuntimeException;
 
-class ScriptExchangeController extends BaseController
+class ScriptExchangeOutController extends BaseController
 {
     public function __construct()
     {
@@ -29,12 +25,13 @@ class ScriptExchangeController extends BaseController
         }
         $options = [
             'certificate' => env('SCRIPT_EXCHANGE_CERT_PATH'),
+            'certificate_type' => "CRT",
             'privateKey' => env('SCRIPT_EXCHANGE_KEY_PATH'),
             'privateKeyPassword' => env('SCRIPT_EXCHANGE_API_KEY'),
             'apiKey' => env('SCRIPT_EXCHANGE_API_KEY'),
         ];
 
-        $url = env('SCRIPT_EXCHANGE_API_KEY');
+        $url = env('SCRIPT_EXCHANGE_URL');
 
         return $this->outboundMessageService->send($url, $xml, $options);
     }

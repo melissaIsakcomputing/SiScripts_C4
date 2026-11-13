@@ -13,14 +13,10 @@ class OutboundMessageService
 
     public function send($xml, $url, $options)
     {
-        $certificateDirectory = ROOTPATH ;
-        $clientCertificatePath = $certificateDirectory . $options['certificate'];
-        $privateKeyPath = $certificateDirectory . $options['privateKey'];
-        $privateKeyPassword = $options['privateKeyPassword'];
-        $apiKey = $options['apiKey'];
+        $certificateDirectory = ROOTPATH;
         $headers = ['Content-Type: application/xml'];
-        if ($apiKey != "") {
-            $headers[] = 'x-api-key: ' . $apiKey;
+        if (array_key_exists("apiKey", $options) && $options['apiKey'] != "") {
+            $headers[] = 'x-api-key: ' . $options['apiKey'];
         }
         $ch = curl_init();
         curl_setopt_array($ch, [
@@ -32,16 +28,18 @@ class OutboundMessageService
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 5,
             CURLOPT_TIMEOUT => 30,
-            CURLOPT_SSLCERT => $clientCertificatePath,
-            CURLOPT_SSLCERTTYPE => 'CRT',
-            CURLOPT_SSLKEY => $privateKeyPath,
-            CURLOPT_SSLKEYTYPE => 'PEM',
-
+            CURLOPT_SSLCERT => $certificateDirectory . $options['certificate'],
+            CURLOPT_SSLCERTTYPE => $options['certificate_type'],
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 2,
         ]);
-        if ($privateKeyPassword != "") {
-            curl_setopt($ch, CURLOPT_KEYPASSWD, $privateKeyPassword);
+
+        if (array_key_exists('privateKey', $options)) {
+            curl_setopt($ch, CURLOPT_SSLKEY, $certificateDirectory . $options['privateKey']);
+            curl_setopt($ch, CURLOPT_SSLKEYTYPE, "PEM");
+        }
+        if (array_key_exists('privateKeyPassword', $options)) {
+            curl_setopt($ch, CURLOPT_KEYPASSWD, $certificateDirectory . $options['privateKeyPassword']);
         }
 
         $responseBody = curl_exec($ch);
