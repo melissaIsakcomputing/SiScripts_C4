@@ -30,7 +30,11 @@ class SureScriptsOutController extends BaseController
 
         $url = env('SURESCRIPT_URL') . "?id=" . $messageId;
 
-        return $this->outboundMessageService->send($xml, $url, $options);
+        $result =  $this->outboundMessageService->send($xml, $url, $options);
+
+        print_r($result);
+
+        return $result;
     }
 
 }
