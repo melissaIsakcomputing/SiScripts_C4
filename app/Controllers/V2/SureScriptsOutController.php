@@ -28,9 +28,9 @@ class SureScriptsOutController extends BaseController
             'certificate_type' => "PEM",
         ];
 
-        $url = env('SURESCRIPT_URL')."?id=".$messageId;
+        $url = env('SURESCRIPT_URL') . "?id=" . $messageId;
 
-        return $this->outboundMessageService->send($url, $xml, $options);
+        return $this->outboundMessageService->send($xml, $url, $options);
     }
 
 }

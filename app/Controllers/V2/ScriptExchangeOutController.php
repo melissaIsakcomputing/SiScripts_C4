@@ -33,7 +33,7 @@ class ScriptExchangeOutController extends BaseController
 
         $url = env('SCRIPT_EXCHANGE_URL');
 
-        return $this->outboundMessageService->send($url, $xml, $options);
+        return $this->outboundMessageService->send( $xml, $url,$options);
     }
 
 }

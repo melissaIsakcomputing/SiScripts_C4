@@ -19,6 +19,7 @@ class OutboundMessageService
             $headers[] = 'x-api-key: ' . $options['apiKey'];
         }
         $ch = curl_init();
+        $verbose = fopen('php://temp', 'w+');
         curl_setopt_array($ch, [
             CURLOPT_URL => $url,
             CURLOPT_PORT => 443,
@@ -32,6 +33,9 @@ class OutboundMessageService
             CURLOPT_SSLCERTTYPE => $options['certificate_type'],
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 2,
+            // Enable verbose cURL trace
+            CURLOPT_VERBOSE => true,
+            CURLOPT_STDERR => $verbose,
         ]);
 
         if (array_key_exists('privateKey', $options)) {
@@ -46,7 +50,20 @@ class OutboundMessageService
         $curlErrorNumber = curl_errno($ch);
         $curlErrorMessage = curl_error($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlInfo = curl_getinfo($ch);
+        // Read verbose trace
+        rewind($verbose);
+        $trace = stream_get_contents($verbose);
+        fclose($verbose);
+
         curl_close($ch);
-        return $responseBody;
+        return [
+            'body' => $responseBody,
+            'httpCode' => $httpCode,
+            'curlErrorNumber' => $curlErrorNumber,
+            'curlErrorMessage' => $curlErrorMessage,
+            'trace' => $trace,
+            'info' => $curlInfo,
+        ];
     }
 }
